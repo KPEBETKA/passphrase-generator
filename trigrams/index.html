@@ -1,175 +1,179 @@
 <html>
+
     <head>
+
         <title>Trigram Passphrase Generator</title>
 
         <script type="text/javascript">
 
-            var language = navigator.languages && navigator.languages[0] || navigator.language || navigator.userLanguage;
+            window.addEventListener('load', function() {
 
-            var script = document.createElement('script');
-            if (language = "ru_RU") {
-                script.src = "trigrams_ru.js";
-            } else {
-                script.src = "trigrams_en.js";
-            }
-            document.head.appendChild(script);
+                var language = navigator.languages && navigator.languages[0] || navigator.language || navigator.userLanguage;
 
-            script.addEventListener('load', function() {
+                var script = document.createElement('script');
+                if (language = "ru_RU") {
+                    script.src = "trigrams_ru.js";
+                } else {
+                    script.src = "trigrams_en.js";
+                }
+                document.head.appendChild(script);
 
-                function _generateword(length) {
-                    var alphabet = "abcdefghijklmnopqrstuvwxyz";
-                    var output = "";
-                    var c1, c2, c3;
-                    var f1, f2, f3;
-                    var s1, s2, s3;
-                    var sumfreq;
-                    var rand;
-                    var nchar = 3;
-                    var entropy = 0
-                    var interimvariations;
-                    
-                    sumfreq = frequencies - 1;
-                    rand = parseFloat('0.' + _getrandint()) * sumfreq;
-                    sumfreq = 0;
-                    for (f1 = 0; f1 < 26; f1++) {
-                        for (f2 = 0; f2 < 26; f2++) {
-                            for (f3 = 0; f3 < 26; f3++) {
-                                sumfreq += trigrams[f1][f2][f3];
-                                if (sumfreq > rand) {
-                                    output += alphabet.charAt(f1);
-                                    output += alphabet.charAt(f2);
-                                    output += alphabet.charAt(f3);
-                                    s1 = f2;
-                                    s2 = f3;
-                                    f1 = 26;
-                                    f2 = 26;
-                                    f3 = 26;
-                                }
-                            }
-                        }
-                    }
+                script.addEventListener('load', function() {
 
-                    while (nchar <= length) {
-                        interimvariations = 0;
-                        sumfreq = 0;
-                        for (s3 = 0; s3 < 26; s3++) {
-                            sumfreq += trigrams[s1][s2][s3];
-                            if (trigrams[s1][s2][s3] != 0) {
-                                interimvariations++;
-                            }
-                        }
-                        if (sumfreq == 0) {
-                            break;
-                        }
-                        entropy = entropy + Math.log2(interimvariations);
-
-                        sumfreq = sumfreq - 1;
+                    function _generateword(length) {
+                        var alphabet = "abcdefghijklmnopqrstuvwxyz";
+                        var output = "";
+                        var c1, c2, c3;
+                        var f1, f2, f3;
+                        var s1, s2, s3;
+                        var sumfreq;
+                        var rand;
+                        var nchar = 3;
+                        var entropy = 0
+                        var interimvariations;
+                        
+                        sumfreq = frequencies - 1;
                         rand = parseFloat('0.' + _getrandint()) * sumfreq;
                         sumfreq = 0;
-                        for (s3 = 0; s3 < 26; s3++) {
-                            sumfreq += trigrams[s1][s2][s3];
-                            if (sumfreq > rand) {
-                                output += alphabet.charAt(s3);
-                                s1 = s2;
-                                s2 = s3;
-                                s3 = 26;
+                        for (f1 = 0; f1 < 26; f1++) {
+                            for (f2 = 0; f2 < 26; f2++) {
+                                for (f3 = 0; f3 < 26; f3++) {
+                                    sumfreq += trigrams[f1][f2][f3];
+                                    if (sumfreq > rand) {
+                                        output += alphabet.charAt(f1);
+                                        output += alphabet.charAt(f2);
+                                        output += alphabet.charAt(f3);
+                                        s1 = f2;
+                                        s2 = f3;
+                                        f1 = 26;
+                                        f2 = 26;
+                                        f3 = 26;
+                                    }
+                                }
                             }
                         }
-                        nchar++;
-                    }
-                    return [output, entropy];
-                }
 
-                function _getrandint() {
-                    try {
-                        var unitArr = new Uint32Array(1);
-                        var cryptoObj = window.crypto || window.msCrypto;
-                        cryptoObj.getRandomValues(unitArr);
-                        return unitArr[0];
-                    }
-                    catch(err) {
-                        console.log("Attention!")
-                        var float = Math.random();
-                        uint = float.toString().replace("0.", "");
-                        return parseInt(uint, 10);
-                    }
-                }
-
-                function _getrandrange(min, max) {
-                        var unit = parseFloat('0.' + _getrandint());
-                        var range = max - min + 1;
-                        return Math.floor(unit * range) + min;
-                }
-            
-                function _generatepassphrase() {
-                    var i;
-                    var length;
-                    var words = [];
-                    var wordentropy;
-                    var totalvariations = letters;
-                    var passphraseentropy = 0;
-                    
-                    for (i = 0; i < wordquantity; i++) {
-                        length = _getrandrange(maxwordlength, minwordlength);
-                        [word, wordentropy] = _generateword(length);
-
-                        if (uppercase) {
-                            if (_getrandint() % 2 != 0) {
-                                word = word.replace(word[0], word[0].toUpperCase());
+                        while (nchar <= length) {
+                            interimvariations = 0;
+                            sumfreq = 0;
+                            for (s3 = 0; s3 < 26; s3++) {
+                                sumfreq += trigrams[s1][s2][s3];
+                                if (trigrams[s1][s2][s3] != 0) {
+                                    interimvariations++;
+                                }
                             }
-                            totalvariations = totalvariations * 2;
-                        }
+                            if (sumfreq == 0) {
+                                break;
+                            }
+                            entropy = entropy + Math.log2(interimvariations);
 
-                        if (numbers) {
-                            if (_getrandint() % 2 != 0) {
+                            sumfreq = sumfreq - 1;
+                            rand = parseFloat('0.' + _getrandint()) * sumfreq;
+                            sumfreq = 0;
+                            for (s3 = 0; s3 < 26; s3++) {
+                                sumfreq += trigrams[s1][s2][s3];
+                                if (sumfreq > rand) {
+                                    output += alphabet.charAt(s3);
+                                    s1 = s2;
+                                    s2 = s3;
+                                    s3 = 26;
+                                }
+                            }
+                            nchar++;
+                        }
+                        return [output, entropy];
+                    }
+
+                    function _getrandint() {
+                        try {
+                            var unitArr = new Uint32Array(1);
+                            var cryptoObj = window.crypto || window.msCrypto;
+                            cryptoObj.getRandomValues(unitArr);
+                            return unitArr[0];
+                        }
+                        catch(err) {
+                            console.log("Attention!")
+                            var float = Math.random();
+                            uint = float.toString().replace("0.", "");
+                            return parseInt(uint, 10);
+                        }
+                    }
+
+                    function _getrandrange(min, max) {
+                            var unit = parseFloat('0.' + _getrandint());
+                            var range = max - min + 1;
+                            return Math.floor(unit * range) + min;
+                    }
+                
+                    function _generatepassphrase() {
+                        var i;
+                        var length;
+                        var words = [];
+                        var wordentropy;
+                        var totalvariations = letters;
+                        var passphraseentropy = 0;
+                        
+                        for (i = 0; i < wordquantity; i++) {
+                            length = _getrandrange(maxwordlength, minwordlength);
+                            [word, wordentropy] = _generateword(length);
+
+                            if (uppercase) {
                                 if (_getrandint() % 2 != 0) {
-                                    word = word + (_getrandint() % 9);
+                                    word = word.replace(word[0], word[0].toUpperCase());
                                 }
-                                else {
-                                    word = (_getrandint() % 9) + word;
-                                }
+                                totalvariations = totalvariations * 2;
                             }
-                            totalvariations = totalvariations * 21;
+
+                            if (numbers) {
+                                if (_getrandint() % 2 != 0) {
+                                    if (_getrandint() % 2 != 0) {
+                                        word = word + (_getrandint() % 9);
+                                    }
+                                    else {
+                                        word = (_getrandint() % 9) + word;
+                                    }
+                                }
+                                totalvariations = totalvariations * 21;
+                            }
+
+                            passphraseentropy += (wordentropy + Math.log2(totalvariations));
+                            words.push(word);
                         }
-
-                        passphraseentropy += (wordentropy + Math.log2(totalvariations));
-                        words.push(word);
+                        return [words.join('-'), Math.round(passphraseentropy)];
                     }
-                    return [words.join('-'), Math.round(passphraseentropy)];
-                }
 
-                function _documentwrite() {
-                    var passphrase;
-                    var passphraseentropy;
-                    var entropies = [];
-                    var passphrases = [];
-                    for (i = 0; i < 20; i++) {
-                    [passphrase, passphraseentropy] = _generatepassphrase()
-                    entropies.push(passphraseentropy);
-                    passphrases.push(passphrase);
+                    function _documentwrite() {
+                        var passphrase;
+                        var passphraseentropy;
+                        var entropies = [];
+                        var passphrases = [];
+                        for (i = 0; i < 20; i++) {
+                        [passphrase, passphraseentropy] = _generatepassphrase()
+                        entropies.push(passphraseentropy);
+                        passphrases.push(passphrase);
+                        }
+                        td = 'Entropy: ' + Math.min(...entropies) + '-' + Math.max(...entropies) + '\n\n\n';
+                        td = td + passphrases.join('\n\n') + '\n\n';
+                        document.write('<td style="width:20%;background-color:' + backgroundcolor + ';color:' + textcolor + ';text-align:center;font-weight:bold;"><pre>' + td + '</pre><td>')
                     }
-                    td = 'Entropy: ' + Math.min(...entropies) + '-' + Math.max(...entropies) + '\n\n\n';
-                    td = td + passphrases.join('\n\n') + '\n\n';
-                    document.write('<td style="width:20%;background-color:' + backgroundcolor + ';color:' + textcolor + ';text-align:center;font-weight:bold;"><pre>' + td + '</pre><td>')
-                }
 
-                //************************************************************************************************
-                // Конфиг ****************************************************************************************
-                //************************************************************************************************
-                var minwordlength = 4;      // Минимальная длина одного слова
-                var maxwordlength = 7;      // Максимальная длина одного слова
-                var wordquantity = 4;       // Количество слов в пароле
-                var uppercase = true;       // Аппекейзить первый символ слова
-                var numbers = true;         // Добавлять цифры к слову
-                //************************************************************************************************
-                //************************************************************************************************
-                //************************************************************************************************
+                    //************************************************************************************************
+                    // Конфиг ****************************************************************************************
+                    //************************************************************************************************
+                    var minwordlength = 4;      // Минимальная длина одного слова
+                    var maxwordlength = 7;      // Максимальная длина одного слова
+                    var wordquantity = 4;       // Количество слов в пароле
+                    var uppercase = true;       // Аппекейзить первый символ слова
+                    var numbers = true;         // Добавлять цифры к слову
+                    //************************************************************************************************
+                    //************************************************************************************************
+                    //************************************************************************************************
 
-                var backgroundcolor;
-                var textcolor;
+                    var backgroundcolor;
+                    var textcolor;
 
-                document.write('<h1 style="background-color:RoyalBlue;color:White;text-align:center">Trigram Passphrase Generator</h1>');
-                document.write('<table style="width:100%;"><tbody><tr>')
+                    document.write('<h1 style="background-color:RoyalBlue;color:White;text-align:center">Trigram Passphrase Generator</h1>');
+                    document.write('<table style="width:100%;"><tbody><tr>')
 
                     wordquantity = 2;
                     uppercase = false;
@@ -206,11 +210,16 @@
                     textcolor = 'White';
                     _documentwrite();
 
-                document.write('</pre></tr></tbody></table>');
+                    document.write('</pre></tr></tbody></table>');
+
+                });
 
             });
+
         </script>
+
     </head>
-    <body>
-    </body>
+
+    <body></body>
+
 </html>
